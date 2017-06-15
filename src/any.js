@@ -28,13 +28,26 @@ var _xany = require('./internal/_xany');
  *      R.any(lessThan0)([1, 2]); //=> false
  *      R.any(lessThan2)([1, 2]); //=> true
  */
+var I = require('immutable');
 module.exports = _curry2(_dispatchable(['any'], _xany, function any(fn, list) {
   var idx = 0;
-  while (idx < list.length) {
-    if (fn(list[idx])) {
-      return true;
+  if (I.isIndexed(list)) {
+    while (idx < list.size) {
+      if (fn(list.get(idx))) {
+        return true;
+      }
+      idx += 1;
     }
-    idx += 1;
+    return false;
+
+  } else {
+    while (idx < list.length) {
+      if (fn(list[idx])) {
+        return true;
+      }
+      idx += 1;
+    }
+    return false;
+
   }
-  return false;
 }));
