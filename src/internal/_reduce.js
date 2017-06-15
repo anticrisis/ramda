@@ -1,7 +1,7 @@
 var _isArrayLike = require('./_isArrayLike');
 var _xwrap = require('./_xwrap');
 var bind = require('../bind');
-
+var I = require('immutable');
 
 module.exports = (function() {
   function _arrayReduce(xf, acc, list) {
@@ -9,6 +9,20 @@ module.exports = (function() {
     var len = list.length;
     while (idx < len) {
       acc = xf['@@transducer/step'](acc, list[idx]);
+      if (acc && acc['@@transducer/reduced']) {
+        acc = acc['@@transducer/value'];
+        break;
+      }
+      idx += 1;
+    }
+    return xf['@@transducer/result'](acc);
+  }
+
+  function _immutableListReduce(xf, acc, list) {
+    var idx = 0;
+    var len = list.size;
+    while (idx < len) {
+      acc = xf['@@transducer/step'](acc, list.get(idx));
       if (acc && acc['@@transducer/reduced']) {
         acc = acc['@@transducer/value'];
         break;
@@ -39,6 +53,9 @@ module.exports = (function() {
   return function _reduce(fn, acc, list) {
     if (typeof fn === 'function') {
       fn = _xwrap(fn);
+    }
+    if (I.isIndexed(list)) {
+      return _immutableListReduce(fn, acc, list);
     }
     if (_isArrayLike(list)) {
       return _arrayReduce(fn, acc, list);

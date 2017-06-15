@@ -1,5 +1,6 @@
 var _isArray = require('./_isArray');
 var _isTransformer = require('./_isTransformer');
+var I = require('immutable');
 
 
 /**
@@ -23,7 +24,7 @@ module.exports = function _dispatchable(methodNames, xf, fn) {
     }
     var args = Array.prototype.slice.call(arguments, 0);
     var obj = args.pop();
-    if (!_isArray(obj)) {
+    if (!_isArray(obj) && !I.isIndexed(obj)) {
       var idx = 0;
       while (idx < methodNames.length) {
         if (typeof obj[methodNames[idx]] === 'function') {

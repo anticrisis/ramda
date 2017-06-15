@@ -1,5 +1,6 @@
 var _cloneRegExp = require('./_cloneRegExp');
 var type = require('../type');
+var I = require('immutable');
 
 
 /**
@@ -30,11 +31,15 @@ module.exports = function _clone(value, refFrom, refTo, deep) {
     }
     return copiedValue;
   };
-  switch (type(value)) {
-    case 'Object':  return copy({});
-    case 'Array':   return copy([]);
-    case 'Date':    return new Date(value.valueOf());
-    case 'RegExp':  return _cloneRegExp(value);
-    default:        return value;
+  if (I.isImmutable(value)) {
+    return value;
+  } else {
+    switch (type(value)) {
+      case 'Object':  return copy({});
+      case 'Array':   return copy([]);
+      case 'Date':    return new Date(value.valueOf());
+      case 'RegExp':  return _cloneRegExp(value);
+      default:        return value;
+    }
   }
 };
