@@ -27,13 +27,26 @@ var _curry3 = require('./internal/_curry3');
  * @symb R.adjust(f, -1, [a, b]) = [a, f(b)]
  * @symb R.adjust(f, 0, [a, b]) = [f(a), b]
  */
+var I = require('immutable');
+
 module.exports = _curry3(function adjust(fn, idx, list) {
-  if (idx >= list.length || idx < -list.length) {
-    return list;
+  if (I.isIndexed(list)) {
+    if (idx >= list.size || idx < -list.size) {
+      return list;
+    }
+    var start = idx < 0 ? list.size : 0;
+    var _idx = start + idx;
+    var _list = _concat(list);
+    return _list.set(_idx, fn(list.get(_idx)));
+  } else {
+    if (idx >= list.length || idx < -list.length) {
+      return list;
+    }
+    var start = idx < 0 ? list.length : 0;
+    var _idx = start + idx;
+    var _list = _concat(list);
+    _list[_idx] = fn(list[_idx]);
+    return _list;
+
   }
-  var start = idx < 0 ? list.length : 0;
-  var _idx = start + idx;
-  var _list = _concat(list);
-  _list[_idx] = fn(list[_idx]);
-  return _list;
 });
