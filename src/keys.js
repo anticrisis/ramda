@@ -21,6 +21,8 @@ var _isArguments = require('./internal/_isArguments');
  *
  *      R.keys({a: 1, b: 2, c: 3}); //=> ['a', 'b', 'c']
  */
+var I = require('immutable');
+
 module.exports = (function() {
   // cover IE < 9 keys issues
   var hasEnumBug = !({toString: null}).propertyIsEnumerable('toString');
@@ -34,41 +36,59 @@ module.exports = (function() {
 
   var contains = function contains(list, item) {
     var idx = 0;
-    while (idx < list.length) {
-      if (list[idx] === item) {
-        return true;
+    if (I.isIndexed(list)) {
+      while (idx < list.size) {
+        if (list.get(idx) === item) {
+          return true;
+        }
+        idx += 1;
       }
-      idx += 1;
+      return false;
+    } else {
+      while (idx < list.length) {
+        if (list[idx] === item) {
+          return true;
+        }
+        idx += 1;
+      }
+      return false;
     }
-    return false;
   };
 
   return typeof Object.keys === 'function' && !hasArgsEnumBug ?
     _curry1(function keys(obj) {
-      return Object(obj) !== obj ? [] : Object.keys(obj);
+      if (I.isKeyed(obj)) {
+        return obj.keys();
+      } else {
+        return Object(obj) !== obj ? [] : Object.keys(obj);
+      }
     }) :
     _curry1(function keys(obj) {
-      if (Object(obj) !== obj) {
-        return [];
-      }
-      var prop, nIdx;
-      var ks = [];
-      var checkArgsLength = hasArgsEnumBug && _isArguments(obj);
-      for (prop in obj) {
-        if (_has(prop, obj) && (!checkArgsLength || prop !== 'length')) {
-          ks[ks.length] = prop;
+      if (I.isKeyed(obj)) {
+        return obj.keys();
+      } else {
+        if (Object(obj) !== obj) {
+          return [];
         }
-      }
-      if (hasEnumBug) {
-        nIdx = nonEnumerableProps.length - 1;
-        while (nIdx >= 0) {
-          prop = nonEnumerableProps[nIdx];
-          if (_has(prop, obj) && !contains(ks, prop)) {
+        var prop, nIdx;
+        var ks = [];
+        var checkArgsLength = hasArgsEnumBug && _isArguments(obj);
+        for (prop in obj) {
+          if (_has(prop, obj) && (!checkArgsLength || prop !== 'length')) {
             ks[ks.length] = prop;
           }
-          nIdx -= 1;
         }
+        if (hasEnumBug) {
+          nIdx = nonEnumerableProps.length - 1;
+          while (nIdx >= 0) {
+            prop = nonEnumerableProps[nIdx];
+            if (_has(prop, obj) && !contains(ks, prop)) {
+              ks[ks.length] = prop;
+            }
+            nIdx -= 1;
+          }
+        }
+        return ks;
       }
-      return ks;
     });
 }());

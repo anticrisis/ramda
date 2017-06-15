@@ -26,11 +26,20 @@ module.exports = function _dispatchable(methodNames, xf, fn) {
     var obj = args.pop();
     if (!_isArray(obj) && !I.isIndexed(obj)) {
       var idx = 0;
-      while (idx < methodNames.length) {
-        if (typeof obj[methodNames[idx]] === 'function') {
-          return obj[methodNames[idx]].apply(obj, args);
+      if (I.isKeyed(obj)) {
+        while (idx < methodNames.length) {
+          if (typeof obj.get(methodNames[idx]) === 'function') {
+            return obj.get(methodNames[idx]).apply(obj, args);
+          }
+          idx += 1;
         }
-        idx += 1;
+      } else {
+        while (idx < methodNames.length) {
+          if (typeof obj[methodNames[idx]] === 'function') {
+            return obj[methodNames[idx]].apply(obj, args);
+          }
+          idx += 1;
+        }
       }
       if (_isTransformer(obj)) {
         var transducer = xf.apply(null, args);
