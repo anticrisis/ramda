@@ -12,13 +12,12 @@
 var I = require('immutable');
 
 module.exports = function _concat(set1, set2) {
-  if (I.isIndexed(set1) || I.isIndexed(set2)) {
-    set1 = set1 || I.List();
-    set2 = set2 || I.List();
+  set1 = set1 || [];
+  set2 = set2 || [];
+  if (I.isIndexed(set1) || I.isIndexed(set2) ||
+      I.isIndexed(set1[0]) || I.isIndexed(set2[0])) {
     return I.List().concat(I.List(set1), I.List(set2));
   } else {
-    set1 = set1 || [];
-    set2 = set2 || [];
     var idx;
     var len1 = set1.length;
     var len2 = set2.length;
