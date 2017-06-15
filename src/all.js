@@ -27,13 +27,25 @@ var _xall = require('./internal/_xall');
  *      R.all(equals3)([3, 3, 3, 3]); //=> true
  *      R.all(equals3)([3, 3, 1, 3]); //=> false
  */
+var I = require('immutable');
 module.exports = _curry2(_dispatchable(['all'], _xall, function all(fn, list) {
   var idx = 0;
-  while (idx < list.length) {
-    if (!fn(list[idx])) {
-      return false;
+  if (I.isIndexed(list)) {
+    while (idx < list.size) {
+      if (!fn(list.get(idx))) {
+        return false;
+      }
+      idx += 1;
     }
-    idx += 1;
+    return true;
   }
-  return true;
+  else {
+    while (idx < list.length) {
+      if (!fn(list[idx])) {
+        return false;
+      }
+      idx += 1;
+    }
+    return true;
+  }
 }));
