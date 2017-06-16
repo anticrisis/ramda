@@ -1,5 +1,6 @@
 var _isArrayLike = require('./_isArrayLike');
-
+var I = require('immutable');
+var _concat = require('./_concat');
 
 /**
  * `_makeFlat` is a helper function that returns a one-level or fully recursive
@@ -7,24 +8,36 @@ var _isArrayLike = require('./_isArrayLike');
  *
  * @private
  */
+
+function size(list) {
+  return I.isIndexed(list) ? list.size : list.length;
+}
+
+function newlist(like) {
+  return I.isIndexed(like) ? I.List() : [];
+}
+
+function getitem(list, idx) {
+  return I.isIndexed(list) ? list.get(idx) : list[idx];
+}
+
+function setitem(list, idx, val) {
+  return I.isIndexed(list) ? list.set(idx, val) : ((list[idx] = val), list);
+}
+
 module.exports = function _makeFlat(recursive) {
   return function flatt(list) {
-    var value, jlen, j;
-    var result = [];
+    var result = newlist(list);
+    var sz = size(list);
     var idx = 0;
-    var ilen = list.length;
-
-    while (idx < ilen) {
-      if (_isArrayLike(list[idx])) {
-        value = recursive ? flatt(list[idx]) : list[idx];
-        j = 0;
-        jlen = value.length;
-        while (j < jlen) {
-          result[result.length] = value[j];
-          j += 1;
-        }
+    var value;
+    while (idx < sz) {
+      value = getitem(list, idx);
+      if (I.isIndexed(value) || _isArrayLike(value)) {
+        value = recursive ? flatt(value) : value;
+        result = _concat(result, value);
       } else {
-        result[result.length] = list[idx];
+        result = setitem(result, size(result), value);
       }
       idx += 1;
     }

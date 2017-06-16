@@ -1,6 +1,6 @@
 var _curry2 = require('./internal/_curry2');
 var _isString = require('./internal/_isString');
-
+var I = require('immutable');
 
 /**
  * Returns the nth element of the given list or string. If n is negative the
@@ -29,6 +29,10 @@ var _isString = require('./internal/_isString');
  * @symb R.nth(1, [a, b, c]) = b
  */
 module.exports = _curry2(function nth(offset, list) {
-  var idx = offset < 0 ? list.length + offset : offset;
-  return _isString(list) ? list.charAt(idx) : list[idx];
+  if (I.isIndexed(list)) {
+    return list.get(offset < 0 ? list.size + offset : offset);
+  } else {
+    var idx = offset < 0 ? list.length + offset : offset;
+    return _isString(list) ? list.charAt(idx) : list[idx];
+  }
 });
