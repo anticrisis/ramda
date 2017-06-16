@@ -20,16 +20,20 @@
       "name": "Graeme Yeates",
       "email": "yeatesgraeme@gmail.com",
       "web": "https://github.com/megawac"
+    },
+    {
+      "name": "Anticrisis",
+      "web": "https://github.com/anticrisis"
     }
   ],
-  "name": "ramda",
-  "description": "A practical functional library for JavaScript programmers.",
-  "version": "0.24.1",
-  "homepage": "http://ramdajs.com/",
+  "name": "ramda-love",
+  "description": "A practical functional library with persistent (immutable) data structures for JavaScript programmers.",
+  "version": "0.0.1",
+  "homepage": "https://github.com/anticrisis/ramda",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/ramda/ramda.git"
+    "url": "git://github.com/anticrisis/ramda.git"
   },
   "main": "index.js",
   "files": [
