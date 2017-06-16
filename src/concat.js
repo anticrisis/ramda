@@ -3,7 +3,7 @@ var _isArray = require('./internal/_isArray');
 var _isFunction = require('./internal/_isFunction');
 var _isString = require('./internal/_isString');
 var toString = require('./toString');
-
+var I = require('immutable');
 
 /**
  * Returns the result of concatenating the given lists or strings.
@@ -32,6 +32,13 @@ var toString = require('./toString');
  *      R.concat([], []); //=> []
  */
 module.exports = _curry2(function concat(a, b) {
+  if (I.isIndexed(a) || I.isIndexed(b)) {
+    a = I.List(a);
+    b = I.List(b);
+  }
+  if (I.isIndexed(a)) {
+    return a.concat(b);
+  }
   if (_isArray(a)) {
     if (_isArray(b)) {
       return a.concat(b);
@@ -46,6 +53,10 @@ module.exports = _curry2(function concat(a, b) {
   }
   if (a != null && _isFunction(a['fantasy-land/concat'])) {
     return a['fantasy-land/concat'](b);
+  }
+  if (I.isKeyed(a) && _isFunction(a.get('concat'))) {
+    // order matters. I.Map has a 'concat' property.
+    return a.get('concat').call(a, b);
   }
   if (a != null && _isFunction(a.concat)) {
     return a.concat(b);
