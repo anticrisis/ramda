@@ -1,5 +1,6 @@
 var R = require('..');
 var eq = require('./shared/eq');
+var I = require('immutable');
 
 
 describe('apply', function() {
@@ -9,6 +10,23 @@ describe('apply', function() {
 
   it('is curried', function() {
     eq(R.apply(Math.max)([1, 2, 3, -99, 42, 6, 7]), 42);
+  });
+
+  it('provides no way to specify context', function() {
+    var obj = {method: function() { return this === obj; }};
+    eq(R.apply(obj.method, []), false);
+    eq(R.apply(R.bind(obj.method, obj), []), true);
+  });
+
+});
+
+describe('Immutable: apply', function() {
+  it('applies function to argument list', function() {
+    eq(R.apply(Math.max, I.List([1, 2, 3, -99, 42, 6, 7])), 42);
+  });
+
+  it('is curried', function() {
+    eq(R.apply(Math.max)(I.List([1, 2, 3, -99, 42, 6, 7])), 42);
   });
 
   it('provides no way to specify context', function() {

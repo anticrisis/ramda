@@ -1,5 +1,5 @@
 var _curry2 = require('./internal/_curry2');
-
+var I = require('immutable');
 
 /**
  * Applies function `fn` to the argument list `args`. This is useful for
@@ -22,5 +22,9 @@ var _curry2 = require('./internal/_curry2');
  * @symb R.apply(f, [a, b, c]) = f(a, b, c)
  */
 module.exports = _curry2(function apply(fn, args) {
-  return fn.apply(this, args);
+  if (I.isIndexed(args)) {
+    return fn.apply(this, args.toJS());
+  } else {
+    return fn.apply(this, args);
+  }
 });
