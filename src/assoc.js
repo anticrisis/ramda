@@ -21,11 +21,17 @@ var _curry3 = require('./internal/_curry3');
  *
  *      R.assoc('c', 3, {a: 1, b: 2}); //=> {a: 1, b: 2, c: 3}
  */
+var I = require('immutable');
 module.exports = _curry3(function assoc(prop, val, obj) {
-  var result = {};
-  for (var p in obj) {
-    result[p] = obj[p];
+  if (I.isKeyed(obj)) {
+    return obj.set(prop, val);
+  } else {
+    var result = {};
+
+    for (var p in obj) {
+      result[p] = obj[p];
+    }
+    result[prop] = val;
+    return result;
   }
-  result[prop] = val;
-  return result;
 });

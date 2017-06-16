@@ -4,7 +4,7 @@ var _isArray = require('./internal/_isArray');
 var _isInteger = require('./internal/_isInteger');
 var assoc = require('./assoc');
 var isNil = require('./isNil');
-
+var I = require('immutable');
 
 /**
  * Makes a shallow clone of an object, setting or overriding the nodes required
@@ -36,13 +36,22 @@ module.exports = _curry3(function assocPath(path, val, obj) {
   }
   var idx = path[0];
   if (path.length > 1) {
-    var nextObj = (!isNil(obj) && _has(idx, obj)) ? obj[idx] : _isInteger(path[1]) ? [] : {};
-    val = assocPath(Array.prototype.slice.call(path, 1), val, nextObj);
+    if (I.isKeyed(obj)) {
+      var nextObj = (!isNil(obj) && _has(idx, obj)) ? obj.get(idx) : _isInteger(path[1]) ? [] : {};
+      val = assocPath(Array.prototype.slice.call(path, 1), val, nextObj);
+    } else {
+      var nextObj = (!isNil(obj) && _has(idx, obj)) ? obj[idx] : _isInteger(path[1]) ? [] : {};
+      val = assocPath(Array.prototype.slice.call(path, 1), val, nextObj);
+    }
   }
-  if (_isInteger(idx) && _isArray(obj)) {
-    var arr = [].concat(obj);
-    arr[idx] = val;
-    return arr;
+  if (_isInteger(idx) && (_isArray(obj) || I.isIndexed(obj))) {
+    if (I.isIndexed(obj)) {
+      return obj.set(idx, val);
+    } else {
+      var arr = [].concat(obj);
+      arr[idx] = val;
+      return arr;
+    }
   } else {
     return assoc(idx, val, obj);
   }
